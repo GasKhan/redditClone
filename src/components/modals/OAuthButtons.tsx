@@ -1,11 +1,17 @@
-import { Avatar, Box, Button } from '@mui/material';
+import { auth } from '@/firebase/clientApp';
+import FIREBASE_ERRORS from '@/firebase/errors';
+import { Avatar, Box, Button, Typography } from '@mui/material';
+import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 
 const OAuthButtons: React.FC = () => {
+  const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
+
   return (
     <Box display="flex" flexDirection="column">
       <Button
         variant="outlined"
         color="secondary"
+        onClick={() => signInWithGoogle()}
         sx={{
           width: '100%',
           m: '7px 0',
@@ -50,6 +56,11 @@ const OAuthButtons: React.FC = () => {
       >
         Continue with ...
       </Button>
+      {error && (
+        <Typography>
+          {FIREBASE_ERRORS[error.message as keyof typeof FIREBASE_ERRORS]}
+        </Typography>
+      )}
     </Box>
   );
 };

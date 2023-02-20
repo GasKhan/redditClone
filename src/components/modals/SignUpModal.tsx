@@ -3,17 +3,39 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { auth } from '@/firebase/clientApp';
+import CircularProgress from '@mui/material/CircularProgress';
+import FIREBASE_ERRORS from '../../firebase/errors';
+import EmailInput from './EmailInput';
+import PasswordInput from './PasswordInput';
+import SwitchToAnotherModal from './SwitchToAnotherModal';
+import SubmitModalButton from './SubmitModalButton';
 
 export default function SignUpModal() {
   const setAuthState = useSetRecoilState(AuthModalState);
+  const [createUserWithEmailAndPassword, user, loading, userError] =
+    useCreateUserWithEmailAndPassword(auth);
+  const [error, setError] = useState('');
 
   const [loginState, setLoginState] = useState({
     email: '',
     password: '',
     confirmPassword: '',
   });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (error) setError('');
+    if (loginState.password !== loginState.confirmPassword) {
+      setError('Password is not the same!');
+      return;
+    }
+
+    createUserWithEmailAndPassword(loginState.email, loginState.password);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginState({
@@ -31,91 +53,39 @@ export default function SignUpModal() {
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <OutlinedInput
-        value={loginState.email}
-        required
-        name="email"
-        type="email"
-        placeholder="email"
-        color="secondary"
-        onChange={handleChange}
-        sx={{
-          mb: '5px',
-          fontSize: '10px',
-          bgcolor: (theme) => theme.palette.grey[50],
-          '& input': {
-            py: '9px',
-          },
-        }}
+      <EmailInput
+        handleChange={handleChange}
+        email={loginState.email}
+        inputName="email"
       />
-      <OutlinedInput
-        value={loginState.password}
-        required
-        name="password"
-        type="password"
-        placeholder="password"
-        onChange={handleChange}
-        color="secondary"
-        sx={{
-          mb: '5px',
-          fontSize: '10px',
-          bgcolor: (theme) => theme.palette.grey[50],
-          '& input': {
-            py: '9px',
-          },
-        }}
+      <PasswordInput
+        handleChange={handleChange}
+        password={loginState.password}
+        inputName="password"
       />
-      <OutlinedInput
-        value={loginState.confirmPassword}
-        required
-        name="confirmPassword"
-        type="password"
-        placeholder="confirm password"
-        onChange={handleChange}
-        color="secondary"
-        sx={{
-          mb: '5px',
-          fontSize: '10px',
-          bgcolor: (theme) => theme.palette.grey[50],
-          '& input': {
-            py: '9px',
-          },
-        }}
+      <PasswordInput
+        handleChange={handleChange}
+        password={loginState.confirmPassword}
+        inputName="confirmPassword"
       />
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: '15px' }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          sx={{ flexGrow: '1', mx: '0' }}
-        >
-          Sign Up
-        </Button>
-      </Box>
-      <Typography fontSize={12} sx={{ cursor: 'inherit' }} align="center">
-        Already a redditor?{' '}
-        <Typography
-          component="button"
-          fontSize={14}
-          fontWeight={600}
-          color="secondary"
-          onClick={handleClick}
-          sx={{
-            bgcolor: 'inherit',
-            border: 'none',
-            '&:hover': {
-              textDecoration: 'underline',
-              cursor: 'pointer',
-            },
-          }}
-        >
-          LOG IN
-        </Typography>
+
+      <Typography color="error" align="center">
+        {error ||
+          FIREBASE_ERRORS[userError?.message as keyof typeof FIREBASE_ERRORS]}
       </Typography>
+      <SubmitModalButton loading={loading} text="Sign Up" />
+      <SwitchToAnotherModal
+        handleClick={handleClick}
+        text="Already a redditor?"
+        linkText="LOG IN"
+      />
     </Box>
   );
 }

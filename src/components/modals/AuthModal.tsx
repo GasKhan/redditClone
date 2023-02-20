@@ -10,15 +10,23 @@ import LoginModal from './LoginModal';
 import SignUpModal from './SignUpModal';
 import OAuthButtons from './OAuthButtons';
 import { Typography } from '@mui/material';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/firebase/clientApp';
+import { useEffect } from 'react';
+import ResetPassword from './ResetPassword';
+import Box from '@mui/system/Box';
 
-type AuthModalProps = {};
-
-const AuthModal: React.FC<AuthModalProps> = () => {
+const AuthModal: React.FC = () => {
   const [{ isOpen, view }, setAuthModalState] = useRecoilState(AuthModalState);
+  const [user, loading, error] = useAuthState(auth);
 
   const handleClose = () => {
     setAuthModalState((prev) => ({ ...prev, isOpen: false }));
   };
+
+  useEffect(() => {
+    if (user) handleClose();
+  }, [user]);
 
   return (
     <div>
@@ -29,12 +37,18 @@ const AuthModal: React.FC<AuthModalProps> = () => {
           {view === 'resetPassword' && 'Reset Password'}
         </DialogTitle>
         <DialogContent>
-          <OAuthButtons />
-          <Typography margin="15px" align="center">
-            OR
-          </Typography>
-          {view === 'logIn' && <LoginModal />}
-          {view === 'signUp' && <SignUpModal />}
+          {view === 'resetPassword' ? (
+            <ResetPassword />
+          ) : (
+            <Box>
+              <OAuthButtons />
+              <Typography margin="15px" align="center">
+                OR
+              </Typography>
+              {view === 'logIn' && <LoginModal />}
+              {view === 'signUp' && <SignUpModal />}
+            </Box>
+          )}
         </DialogContent>
 
         <IconButton

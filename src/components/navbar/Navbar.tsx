@@ -2,8 +2,11 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import SearchInput from './SearchInput';
 import RightContent from './rightContent/RightContent';
+import { auth } from '@/firebase/clientApp';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const Navbar: React.FC = () => {
+  const [user, loading, error] = useAuthState(auth);
   return (
     <Box
       component="nav"
@@ -33,7 +36,7 @@ const Navbar: React.FC = () => {
         }}
       />
       <SearchInput />
-      <RightContent />
+      <RightContent user={user} />
     </Box>
   );
 };

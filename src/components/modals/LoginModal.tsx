@@ -1,16 +1,29 @@
-import { AuthModalState } from '@/atoms/authModalAtom';
-import { Box, Button, Input, OutlinedInput, Typography } from '@mui/material';
-import { green } from '@mui/material/colors';
+import { AuthModalState, IAuthModalState } from '@/atoms/authModalAtom';
+import { auth } from '@/firebase/clientApp';
+import { Box, Button, OutlinedInput, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import FIREBASE_ERRORS from '@/firebase/errors';
+import EmailInput from './EmailInput';
+import PasswordInput from './PasswordInput';
+import SwitchToAnotherModal from './SwitchToAnotherModal';
+import SubmitModalButton from './SubmitModalButton';
 
 const LoginModal: React.FC = () => {
   const setAuthState = useSetRecoilState(AuthModalState);
+  const [signInWithEmailAndPassword, user, loading, error] =
+    useSignInWithEmailAndPassword(auth);
 
   const [loginState, setLoginState] = useState({
     email: '',
     password: '',
   });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(loginState.email, loginState.password);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginState({
@@ -19,83 +32,48 @@ const LoginModal: React.FC = () => {
     });
   };
 
-  const handleClick = () => {
+  const handleClick = (view: IAuthModalState['view']) => {
     setAuthState((prev) => ({
       ...prev,
-      view: 'signUp',
+      view: view,
     }));
   };
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <OutlinedInput
-        value={loginState.email}
-        required
-        name="email"
-        type="email"
-        placeholder="email"
-        color="secondary"
-        onChange={handleChange}
-        sx={{
-          mb: '5px',
-          fontSize: '10px',
-          bgcolor: (theme) => theme.palette.grey[50],
-          '& input': {
-            py: '9px',
-          },
-        }}
+      <EmailInput
+        email={loginState.email}
+        inputName="email"
+        handleChange={handleChange}
       />
-      <OutlinedInput
-        value={loginState.password}
-        required
-        name="password"
-        type="password"
-        placeholder="password"
-        onChange={handleChange}
-        color="secondary"
-        sx={{
-          mb: '5px',
-          fontSize: '10px',
-          bgcolor: (theme) => theme.palette.grey[50],
-          '& input': {
-            py: '9px',
-          },
-        }}
+      <PasswordInput
+        password={loginState.password}
+        inputName="password"
+        handleChange={handleChange}
       />
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: '15px' }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          sx={{ flexGrow: '1', mx: '0' }}
-        >
-          Log In
-        </Button>
-      </Box>
-      <Typography fontSize={12} sx={{ cursor: 'inherit' }} align="center">
-        New to Reddit?{' '}
-        <Typography
-          component="button"
-          fontSize={14}
-          fontWeight={600}
-          color="secondary"
-          onClick={handleClick}
-          sx={{
-            bgcolor: 'inherit',
-            border: 'none',
-            '&:hover': {
-              textDecoration: 'underline',
-              cursor: 'pointer',
-            },
-          }}
-        >
-          SIGN UP
-        </Typography>
+      <Typography color="error" align="center">
+        {error &&
+          FIREBASE_ERRORS[error?.message as keyof typeof FIREBASE_ERRORS]}
       </Typography>
+      <SubmitModalButton loading={loading} text="Log In" />
+      <SwitchToAnotherModal
+        handleClick={() => handleClick('resetPassword')}
+        text="Forgot your password"
+        linkText="RESET YOUR PASSWORD"
+      />
+
+      <SwitchToAnotherModal
+        handleClick={() => handleClick('signUp')}
+        text="New to Reddit?"
+        linkText="SIGN UP"
+      />
     </Box>
   );
 };
