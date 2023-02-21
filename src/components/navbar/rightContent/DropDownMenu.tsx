@@ -21,7 +21,7 @@ import { MenuList, Typography } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 interface DropDownMenuProps {
-  user: User;
+  user?: User | null;
 }
 
 const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
@@ -48,7 +48,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
           <IconButton
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2 }}
+            sx={{ ml: 2, borderRadius: '10px' }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
@@ -56,7 +56,11 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
             {user ? (
               <Box display="flex" alignItems="center">
                 <RedditIcon sx={{ width: 32, height: 32 }} />
-                <Box display={{ xs: 'none', md: 'flex' }} sx={{ mx: '15px' }}>
+                <Box
+                  display={{ xs: 'none', md: 'flex' }}
+                  flexDirection="column"
+                  sx={{ mx: '15px' }}
+                >
                   <Typography fontWeight="700" fontSize="14px" color="#000">
                     {user?.displayName || user.email?.split('@')[0]}
                   </Typography>

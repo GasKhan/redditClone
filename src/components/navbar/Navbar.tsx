@@ -2,6 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import SearchInput from './SearchInput';
 import RightContent from './rightContent/RightContent';
+import Directory from './directory/Directory';
 import { auth } from '@/firebase/clientApp';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
@@ -12,10 +13,10 @@ const Navbar: React.FC = () => {
       component="nav"
       sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+        alignItems: 'center',
         p: '6px 12px',
         bgcolor: '#fff',
-        alignItems: 'center',
       }}
     >
       <Box
@@ -23,6 +24,7 @@ const Navbar: React.FC = () => {
         src="./images/redditFace.svg"
         sx={{
           height: 30,
+          mr: '10px',
         }}
       />
       <Box
@@ -36,7 +38,9 @@ const Navbar: React.FC = () => {
           },
         }}
       />
-      <SearchInput />
+
+      {user && <Directory />}
+      <SearchInput user={user} />
       <RightContent user={user} />
     </Box>
   );

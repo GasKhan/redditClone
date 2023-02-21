@@ -1,12 +1,20 @@
 import { AccountCircle } from '@mui/icons-material';
 import { Box, InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { User } from 'firebase/auth';
 
-type SearchInputProps = {};
+type SearchInputProps = {
+  user?: User | null;
+};
 
-const SearchInput: React.FC<SearchInputProps> = () => {
+const SearchInput: React.FC<SearchInputProps> = ({ user }) => {
   return (
-    <Box sx={{ display: 'flex', flexGrow: 1 }} component="form">
+    <Box
+      display="flex"
+      flexGrow="1"
+      sx={{ maxWidth: user ? 'auto' : '600px' }}
+      component="form"
+    >
       <TextField
         placeholder="Search Reddit"
         variant="outlined"

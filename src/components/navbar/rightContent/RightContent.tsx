@@ -7,7 +7,7 @@ import DropDownMenu from './DropDownMenu';
 import Icons from './Icons';
 
 type RightContentProps = {
-  user: User;
+  user?: User | null;
 };
 
 const RightContent: React.FC<RightContentProps> = ({ user }) => {
