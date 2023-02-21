@@ -1,6 +1,6 @@
 import { AuthModalState, IAuthModalState } from '@/atoms/authModalAtom';
 import { auth } from '@/firebase/clientApp';
-import { Box, Button, OutlinedInput, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';

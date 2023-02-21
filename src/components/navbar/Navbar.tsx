@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
       component="nav"
       sx={{
         display: 'flex',
+        justifyContent: 'space-between',
         p: '6px 12px',
         bgcolor: '#fff',
         alignItems: 'center',

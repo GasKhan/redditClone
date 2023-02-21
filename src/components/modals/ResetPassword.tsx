@@ -13,6 +13,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = () => {
   const [email, setEmail] = useState('');
   const setAuthState = useSetRecoilState(AuthModalState);
   const [success, setSuccess] = useState(false);
+
   const [sendPasswordResetEmail, sending, error] =
     useSendPasswordResetEmail(auth);
 

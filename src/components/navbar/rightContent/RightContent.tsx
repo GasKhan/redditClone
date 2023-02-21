@@ -1,29 +1,21 @@
 import AuthModal from '@/components/modals/AuthModal';
 import { auth } from '@/firebase/clientApp';
-import Button from '@mui/material/Button';
-import { signOut } from 'firebase/auth';
+import { signOut, User } from 'firebase/auth';
 import React from 'react';
 import AuthButtons from './AuthButtons';
+import DropDownMenu from './DropDownMenu';
+import Icons from './Icons';
 
 type RightContentProps = {
-  user: any;
+  user: User;
 };
 
 const RightContent: React.FC<RightContentProps> = ({ user }) => {
   return (
     <>
       <AuthModal />
-      {user ? (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => signOut(auth)}
-        >
-          Log out
-        </Button>
-      ) : (
-        <AuthButtons />
-      )}
+      {user ? <Icons /> : <AuthButtons />}
+      <DropDownMenu user={user} />
     </>
   );
 };
