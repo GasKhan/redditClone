@@ -3,17 +3,16 @@ import Box from '@mui/material/Box';
 import HomeIcon from '@mui/icons-material/Home';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Avatar from '@mui/material/Avatar';
+import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Typography } from '@mui/material';
+import CreateCommunityModal from '@/components/modals/CreateCommunityModal';
 
-type DirectoryProps = {};
-
-const Directory: React.FC<DirectoryProps> = () => {
+const Directory: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -68,7 +67,7 @@ const Directory: React.FC<DirectoryProps> = () => {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
+        // onClick={handleClose}
         PaperProps={{
           elevation: 0,
           sx: {
@@ -98,13 +97,10 @@ const Directory: React.FC<DirectoryProps> = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Home
+        <MenuItem>
+          <AddIcon />
+          <CreateCommunityModal />
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Another
-        </MenuItem>
-        <Divider />
       </Menu>
     </React.Fragment>
   );
