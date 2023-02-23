@@ -1,10 +1,23 @@
-import { auth } from '@/firebase/clientApp';
+import { auth, firestore } from '@/firebase/clientApp';
 import FIREBASE_ERRORS from '@/firebase/errors';
 import { Avatar, Box, Button, Typography } from '@mui/material';
+import { User } from 'firebase/auth';
+import { collection, doc, setDoc } from 'firebase/firestore';
+import { useEffect } from 'react';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 
 const OAuthButtons: React.FC = () => {
-  const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
+  const [signInWithGoogle, userCred, loading, error] =
+    useSignInWithGoogle(auth);
+
+  const createUserDocument = async (user: User) => {
+    const userDocRef = doc(collection(firestore, 'users'), user.uid);
+    await setDoc(userDocRef, JSON.parse(JSON.stringify(user)));
+  };
+
+  useEffect(() => {
+    if (userCred) createUserDocument(userCred.user);
+  }, [userCred]);
 
   return (
     <Box display="flex" flexDirection="column">

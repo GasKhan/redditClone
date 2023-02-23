@@ -1,24 +1,34 @@
 import { AuthModalState } from '@/atoms/authModalAtom';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { auth } from '@/firebase/clientApp';
-import CircularProgress from '@mui/material/CircularProgress';
+import { auth, firestore } from '@/firebase/clientApp';
 import FIREBASE_ERRORS from '../../firebase/errors';
 import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import SwitchToAnotherModal from './SwitchToAnotherModal';
 import SubmitModalButton from './SubmitModalButton';
+import { addDoc, collection } from 'firebase/firestore';
+import { User } from 'firebase/auth';
 
 export default function SignUpModal() {
   const setAuthState = useSetRecoilState(AuthModalState);
-  const [createUserWithEmailAndPassword, user, loading, userError] =
+  const [createUserWithEmailAndPassword, userCred, loading, userError] =
     useCreateUserWithEmailAndPassword(auth);
   const [error, setError] = useState('');
+
+  const createUserDocument = async (user: User) => {
+    await addDoc(
+      collection(firestore, 'users'),
+      JSON.parse(JSON.stringify(user))
+    );
+  };
+
+  useEffect(() => {
+    if (userCred) createUserDocument(userCred.user);
+  }, [userCred]);
 
   const [loginState, setLoginState] = useState({
     email: '',
@@ -33,8 +43,12 @@ export default function SignUpModal() {
       setError('Password is not the same!');
       return;
     }
-
-    createUserWithEmailAndPassword(loginState.email, loginState.password);
+    try {
+      createUserWithEmailAndPassword(loginState.email, loginState.password);
+    } catch (error: any) {
+      setError(error.message);
+      console.log(error);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

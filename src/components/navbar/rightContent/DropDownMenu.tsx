@@ -61,7 +61,12 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
                   flexDirection="column"
                   sx={{ mx: '15px' }}
                 >
-                  <Typography fontWeight="700" fontSize="14px" color="#000">
+                  <Typography
+                    fontWeight="700"
+                    fontSize="14px"
+                    color="#000"
+                    overflow="hidden"
+                  >
                     {user?.displayName || user.email?.split('@')[0]}
                   </Typography>
                   <Box display="flex">

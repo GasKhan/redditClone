@@ -58,7 +58,6 @@ const CreateCommunityModal: React.FC = () => {
       const communityDoc = await getDoc(communityDocRef);
       if (communityDoc.exists()) {
         throw new Error(`Sorry, ${communityName} is taken. Try another.`);
-        return;
       }
 
       await setDoc(communityDocRef, {
