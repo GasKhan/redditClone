@@ -26,6 +26,7 @@ export const theme = createTheme({
           theme.unstable_sx({
             height: '33px',
             mx: '7px',
+            color: 'secondary',
             px: {
               sm: '5px',
               md: '15px',

@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
     >
       <Box
         component="img"
-        src="./images/redditFace.svg"
+        src="/images/redditFace.svg"
         sx={{
           height: 30,
           mr: '10px',
@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
       />
       <Box
         component="img"
-        src="./images/redditText.svg"
+        src="/images/redditText.svg"
         sx={{
           width: 46,
           display: {

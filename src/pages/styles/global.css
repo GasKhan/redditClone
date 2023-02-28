@@ -21,3 +21,7 @@
   font-weight: 700;
   src: url('../../../public/fonts/OpenSans-Bold.ttf') format(truetype);
 }
+
+* {
+  box-sizing: border-box;
+}

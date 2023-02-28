@@ -11,10 +11,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/system/Box';
 import CommunityCheckbox from './CommunityCheckbox';
 import SubmitModalButton from './SubmitModalButton';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, firestore } from '@/firebase/clientApp';
-import { useRecoilValue } from 'recoil';
-import { AuthModalState } from '@/atoms/authModalAtom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 const CreateCommunityModal: React.FC = () => {
@@ -32,7 +30,7 @@ const CreateCommunityModal: React.FC = () => {
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length < 21) setCommunityName(e.target.value);
+    if (e.target.value.length <= 21) setCommunityName(e.target.value);
   };
 
   const handleClickOpen = () => {
@@ -55,16 +53,26 @@ const CreateCommunityModal: React.FC = () => {
 
     try {
       const communityDocRef = doc(firestore, 'communities', communityName);
-      const communityDoc = await getDoc(communityDocRef);
-      if (communityDoc.exists()) {
-        throw new Error(`Sorry, ${communityName} is taken. Try another.`);
-      }
 
-      await setDoc(communityDocRef, {
-        creatorId: user?.uid,
-        createdAt: serverTimestamp(),
-        numberOfMembers: 1,
-        privacyType: communityType,
+      await runTransaction(firestore, async (transaction) => {
+        const communityDoc = await transaction.get(communityDocRef);
+        if (communityDoc.exists()) {
+          throw new Error(`Sorry, ${communityName} is taken. Try another.`);
+        }
+        transaction.set(communityDocRef, {
+          creatorId: user?.uid,
+          createdAt: serverTimestamp(),
+          numberOfMembers: 1,
+          privacyType: communityType,
+        });
+
+        transaction.set(
+          doc(firestore, `users/${user?.uid}/communitySnippets`, communityName),
+          {
+            communityName: communityName,
+            isModerator: true,
+          }
+        );
       });
     } catch (e: any) {
       console.log(e.message);
@@ -74,7 +82,9 @@ const CreateCommunityModal: React.FC = () => {
 
   return (
     <div>
-      <Button onClick={handleClickOpen}>Open form dialog</Button>
+      <Button onClick={handleClickOpen} sx={{ color: '#000' }}>
+        Create a new community
+      </Button>
       <Dialog open={open} fullWidth maxWidth="sm">
         <IconButton
           aria-label="close"
@@ -100,6 +110,7 @@ const CreateCommunityModal: React.FC = () => {
               </Typography>
             </DialogContentText>
             <TextField
+              onBlur={() => console.log('blur')}
               autoFocus
               margin="dense"
               id="name"

@@ -55,7 +55,14 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
           >
             {user ? (
               <Box display="flex" alignItems="center">
-                <RedditIcon sx={{ width: 32, height: 32 }} />
+                <RedditIcon
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: '#9e9e9e',
+                    fill: '#fff',
+                  }}
+                />
                 <Box
                   display={{ xs: 'none', md: 'flex' }}
                   flexDirection="column"

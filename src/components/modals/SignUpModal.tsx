@@ -36,15 +36,19 @@ export default function SignUpModal() {
     confirmPassword: '',
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (error) setError('');
-    if (loginState.password !== loginState.confirmPassword) {
-      setError('Password is not the same!');
-      return;
-    }
+
     try {
-      createUserWithEmailAndPassword(loginState.email, loginState.password);
+      if (loginState.password !== loginState.confirmPassword) {
+        throw new Error('Password is not the same!');
+      }
+
+      await createUserWithEmailAndPassword(
+        loginState.email,
+        loginState.password
+      );
     } catch (error: any) {
       setError(error.message);
       console.log(error);
