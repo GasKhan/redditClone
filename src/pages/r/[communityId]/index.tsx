@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/firebase/clientApp';
 import { GetServerSidePropsContext } from 'next';
-import { ICommunity } from '@/atoms/communityAtom';
+import communityStateData, { ICommunity } from '@/atoms/communityAtom';
 import safeJsonStringify from 'safe-json-stringify';
 import NotFound from '../../../components/CommunityNotFound';
-import CommunityHeader from './CommunityHeader';
+import CommunityHeader from '../../../components/community/CommunityHeader';
 import { Box } from '@mui/material';
 import PageContent from '../../../components/layouts/PageContent';
 import CreatePostLink from '@/components/CreatePostLink';
 import Posts from '@/components/posts/Posts';
+import { useSetRecoilState } from 'recoil';
+import About from '@/components/community/About';
 
 type CommunityPageProps = {
   communityData: ICommunity;
@@ -17,6 +19,15 @@ type CommunityPageProps = {
 
 const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
   if (!communityData) return <NotFound />;
+
+  const setCommunityStateData = useSetRecoilState(communityStateData);
+
+  useEffect(() => {
+    setCommunityStateData((prev) => ({
+      ...prev,
+      currentCommunity: communityData,
+    }));
+  });
 
   return (
     <Box
@@ -31,7 +42,9 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
           <CreatePostLink />
           <Posts communityData={communityData} />
         </>
-        <></>
+        <>
+          <About community={communityData} />
+        </>
       </PageContent>
     </Box>
   );

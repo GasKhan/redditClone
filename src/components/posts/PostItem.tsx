@@ -2,7 +2,13 @@ import Box from '@mui/material/Box';
 import React, { useState } from 'react';
 import ArrowCircleUpSharpIcon from '@mui/icons-material/ArrowCircleUpSharp';
 import ArrowCircleDownSharpIcon from '@mui/icons-material/ArrowCircleDownSharp';
-import { Skeleton, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  CircularProgress,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { Post } from '@/atoms/postsAtom';
 import moment from 'moment';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
@@ -15,7 +21,7 @@ type PostItemProps = {
   userIsCreator: boolean;
   userVoteValue: number | undefined;
   onVote: () => void;
-  onDelete: () => void;
+  onDelete: (post: Post) => Promise<boolean>;
   onSelect: () => void;
 };
 
@@ -28,6 +34,23 @@ const PostItem: React.FC<PostItemProps> = ({
   onSelect,
 }) => {
   const [imgLoading, setImgLoading] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+
+  const handleDelete = async () => {
+    setLoadingDelete(true);
+    try {
+      const success = await onDelete(post);
+      if (!success) throw new Error('Failed to delete post');
+
+      console.log('Deleted with success');
+    } catch (e: any) {
+      console.log(e.message);
+      setDeleteError(true);
+    }
+    setLoadingDelete(true);
+  };
+
   return (
     <Box display="flex" border="1px solid #9e9e9e" mb="10px" borderRadius="3px">
       <Box
@@ -56,7 +79,11 @@ const PostItem: React.FC<PostItemProps> = ({
           }}
         />
       </Box>
+
       <Stack flexGrow="1" bgcolor="#fff" p="10px 15px">
+        {deleteError && (
+          <Alert severity="error">Error while deleting post</Alert>
+        )}
         <Typography color="#9e9e9e" fontSize="12px">
           Posted by u/{post.creatorDisplayName} a{' '}
           {moment(new Date(post.createdAt.seconds * 1000)).fromNow()}
@@ -149,7 +176,7 @@ const PostItem: React.FC<PostItemProps> = ({
               alignItems="center"
               mr="15px"
               p="5px"
-              onClick={onDelete}
+              onClick={handleDelete}
               sx={{
                 '&:hover': {
                   bgcolor: '#eee',
@@ -157,12 +184,18 @@ const PostItem: React.FC<PostItemProps> = ({
                 },
               }}
             >
-              <DeleteOutlineOutlinedIcon
-                sx={{ fill: '#9e9e9e', mr: '3px', height: '20px' }}
-              />
-              <Typography sx={{ color: '#9e9e9e', fontSize: '12px' }}>
-                Delete
-              </Typography>
+              {loadingDelete ? (
+                <CircularProgress sx={{ color: '#9e9e9e' }} size="17px" />
+              ) : (
+                <>
+                  <DeleteOutlineOutlinedIcon
+                    sx={{ fill: '#9e9e9e', mr: '3px', height: '20px' }}
+                  />
+                  <Typography sx={{ color: '#9e9e9e', fontSize: '12px' }}>
+                    Delete
+                  </Typography>
+                </>
+              )}
             </Box>
           )}
         </Box>

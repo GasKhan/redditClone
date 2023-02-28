@@ -31,6 +31,7 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
       );
       const postsFromDB = await getDocs(postsQuery);
       const posts = postsFromDB.docs.map((doc) => ({
+        id: doc.id,
         ...doc.data(),
       }));
 
@@ -54,6 +55,7 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
     <Box>
       {postsData.posts.map((post) => (
         <PostItem
+          key={post.id}
           post={post}
           userVoteValue={undefined}
           userIsCreator={user?.uid === post.creatorId}

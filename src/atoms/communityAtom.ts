@@ -6,7 +6,7 @@ export interface ICommunity {
   authorId: string;
   numberOfMembers: number;
   privacyType: 'public' | 'restricted' | 'private';
-  timeStamp?: Timestamp;
+  createdAt?: Timestamp;
   imageUrl?: string;
 }
 
