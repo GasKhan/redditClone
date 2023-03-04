@@ -14,8 +14,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
 const useCommunityData = () => {
-  const [communityStateData, setCommunityStateData] =
-    useRecoilState(communityAtom);
+  const [communityInfo, setCommunityInfo] = useRecoilState(communityAtom);
   const [user] = useAuthState(auth);
   const [error, setError] = useState('');
   const setAuthModalState = useSetRecoilState(AuthModalState);
@@ -26,7 +25,7 @@ const useCommunityData = () => {
         collection(firestore, `users/${user?.uid}/communitySnippets`)
       );
       const snippets = userSnippets.docs.map((doc) => ({ ...doc.data() }));
-      setCommunityStateData((prev) => ({
+      setCommunityInfo((prev) => ({
         ...prev,
         communitySnippets: snippets as ICommunitySnippet[],
       }));
@@ -72,7 +71,7 @@ const useCommunityData = () => {
 
       await batch.commit();
 
-      setCommunityStateData((prev) => ({
+      setCommunityInfo((prev) => ({
         ...prev,
         communitySnippets: [newSnippet],
       }));
@@ -95,7 +94,7 @@ const useCommunityData = () => {
 
       await batch.commit();
 
-      setCommunityStateData((prev) => ({
+      setCommunityInfo((prev) => ({
         ...prev,
         communitySnippets: prev.communitySnippets.filter(
           (com) => com.id !== community.id
@@ -112,6 +111,6 @@ const useCommunityData = () => {
     getSnippets();
   }, [user]);
 
-  return { communityStateData, onJoinOrLeaveCommunity, error };
+  return { communityInfo, onJoinOrLeaveCommunity, error };
 };
 export default useCommunityData;

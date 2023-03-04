@@ -4,7 +4,7 @@ import { auth, firestore } from '@/firebase/clientApp';
 import usePosts from '@/hooks/usePosts';
 import Box from '@mui/material/Box';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRecoilValue } from 'recoil';
 import PostItem from './PostItem';
@@ -57,7 +57,10 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
         <PostItem
           key={post.id}
           post={post}
-          userVoteValue={undefined}
+          userVoteValue={
+            postsData.postVotes.find((vote) => vote.postId === post.id)
+              ?.voteStatus
+          }
           userIsCreator={user?.uid === post.creatorId}
           onVote={onVotePost}
           onDelete={onDeletePost}

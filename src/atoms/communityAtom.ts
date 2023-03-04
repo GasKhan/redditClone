@@ -16,15 +16,16 @@ export interface ICommunitySnippet {
   imageUrl?: string;
 }
 
-const defaultCommunityState: {
+export type ICommunityState = {
   communitySnippets: ICommunitySnippet[];
   currentCommunity: ICommunity;
-} = {
+};
+const defaultCommunityState: ICommunityState = {
   communitySnippets: [],
   currentCommunity: {} as ICommunity,
 };
 
-const communityStateData = atom({
+const communityStateData = atom<ICommunityState>({
   key: 'communityStateData',
   default: defaultCommunityState,
 });

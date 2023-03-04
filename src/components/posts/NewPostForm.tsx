@@ -24,6 +24,7 @@ import { useRouter } from 'next/router';
 import { firestore, storage } from '@/firebase/clientApp';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
 import Alert from '@mui/material/Alert';
+import useSelectFile from '@/hooks/useSelectFile';
 
 type NewPostFormProps = {
   user: User;
@@ -58,15 +59,15 @@ const tabs: ITab[] = [
 
 const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
   const router = useRouter();
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(tabs[0].title);
   const [postValue, setPostValue] = useState({
     title: '',
     body: '',
   });
-  const [selectedFile, setSelectedFile] = useState<string>();
   const { currentCommunity } = useRecoilValue(communityAtom);
+  const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPostValue((prev) => ({
@@ -75,20 +76,12 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const reader = new FileReader();
-
-    if (e.target.files?.[0]) {
-      reader.readAsDataURL(e.target.files[0]);
+  const handlePostSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!postValue.title) {
+      setError('Post should have a title');
+      return;
     }
 
-    reader.onload = (readerEvent) => {
-      if (readerEvent.target?.result)
-        setSelectedFile(readerEvent.target.result as string);
-    };
-  };
-
-  const handlePostSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const { communityId } = router.query;
     setLoading(true);
     try {
@@ -116,11 +109,11 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
         await updateDoc(postDocRef, {
           imageUrl: downloadUrl,
         });
-
-        router.back();
       }
+      router.back();
     } catch (e: any) {
       console.log(e.message);
+      setError(e.message);
     }
     setLoading(false);
   };
@@ -156,12 +149,14 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
             selectedFile={selectedFile as string}
             setSelectedFile={setSelectedFile}
             setSelectedTab={setSelectedTab}
-            handleImageChange={handleImageChange}
+            handleImageChange={onSelectFile}
           />
         )}
       </Box>
 
-      {error && <Alert severity="error">Error while creating post</Alert>}
+      {error && (
+        <Alert severity="error">Error while creating post. {error}</Alert>
+      )}
     </>
   );
 };

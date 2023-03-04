@@ -15,12 +15,14 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import communityStateData from '@/atoms/communityAtom';
+import { useRecoilValue } from 'recoil';
 
 type PostItemProps = {
   post: Post;
   userIsCreator: boolean;
   userVoteValue: number | undefined;
-  onVote: () => void;
+  onVote: (post: Post, vote: number, communityId: string) => void;
   onDelete: (post: Post) => Promise<boolean>;
   onSelect: () => void;
 };
@@ -36,6 +38,7 @@ const PostItem: React.FC<PostItemProps> = ({
   const [imgLoading, setImgLoading] = useState(true);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
+  const { currentCommunity } = useRecoilValue(communityStateData);
 
   const handleDelete = async () => {
     setLoadingDelete(true);
@@ -62,7 +65,7 @@ const PostItem: React.FC<PostItemProps> = ({
         p="10px"
       >
         <ArrowCircleUpSharpIcon
-          onClick={onVote}
+          onClick={() => onVote(post, 1, currentCommunity.id)}
           sx={{
             fill: userVoteValue === 1 ? '#fff' : '#9e9e9e',
             bgcolor: userVoteValue === 1 ? '#ff4300' : 'inherit',
@@ -71,10 +74,10 @@ const PostItem: React.FC<PostItemProps> = ({
         />
         <Typography>{post.voteStatus}</Typography>
         <ArrowCircleDownSharpIcon
-          onClick={onVote}
+          onClick={() => onVote(post, -1, currentCommunity.id)}
           sx={{
             fill: userVoteValue === -1 ? '#fff' : '#9e9e9e',
-            bgcolor: userVoteValue === -1 ? '#ff4300' : 'inherit',
+            bgcolor: userVoteValue === -1 ? '#0079d3' : 'inherit',
             borderRadius: '50%',
           }}
         />
@@ -129,7 +132,7 @@ const PostItem: React.FC<PostItemProps> = ({
               sx={{ fill: '#9e9e9e', mr: '3px', height: '20px' }}
             />
             <Typography sx={{ color: '#9e9e9e', fontSize: '12px' }}>
-              {post.voteStatus}
+              {post.numberOfComments}
             </Typography>
           </Box>
           <Box
