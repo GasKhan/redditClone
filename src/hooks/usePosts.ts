@@ -1,26 +1,36 @@
-import communityStateData from '@/atoms/communityAtom';
+import { AuthModalState } from '@/atoms/authModalAtom';
+import communityStateData, { ICommunity } from '@/atoms/communityAtom';
 import postsAtom, { IPostVote, Post } from '@/atoms/postsAtom';
 import { auth, firestore, storage } from '@/firebase/clientApp';
 import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   where,
   writeBatch,
 } from 'firebase/firestore';
 import { deleteObject, ref } from 'firebase/storage';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { noWait, useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 const usePosts = () => {
   const [postsData, setPostsData] = useRecoilState(postsAtom);
-  const communityState = useRecoilValue(communityStateData);
+  const [communityState, setCommunityState] =
+    useRecoilState(communityStateData);
   const [user, loadingUser] = useAuthState(auth);
+  const setAuthModalState = useSetRecoilState(AuthModalState);
+  const router = useRouter();
 
-  const onDeletePost = async (post: Post): Promise<boolean> => {
+  const onDeletePost = async (
+    e: React.MouseEvent,
+    post: Post
+  ): Promise<boolean> => {
+    e.stopPropagation();
     try {
       if (post.imageUrl) {
         const imageRef = ref(storage, `posts/${post.id}/image`);
@@ -34,6 +44,7 @@ const usePosts = () => {
         ...prev,
         posts: prev.posts.filter((item) => item.id !== post.id),
       }));
+
       return true;
     } catch (e: any) {
       console.log(e.message);
@@ -41,7 +52,22 @@ const usePosts = () => {
     }
   };
 
-  const onVotePost = async (post: Post, vote: number, communityId: string) => {
+  const onVotePost = async (
+    e: React.MouseEvent,
+    post: Post,
+    vote: number,
+    communityId: string
+  ) => {
+    e.stopPropagation();
+    if (!user?.uid) {
+      setAuthModalState({
+        view: 'logIn',
+        isOpen: true,
+      });
+
+      return;
+    }
+
     const { voteStatus } = post;
     const existingPostVote = postsData.postVotes.find(
       (vote) => vote.postId === post.id
@@ -137,22 +163,57 @@ const usePosts = () => {
   };
 
   const getCommunityPostVotes = async (communityId: string) => {
-    const postVotesQuery = query(
-      collection(firestore, `users/${user!.uid}/postVotes`),
-      where('communityId', '==', communityId)
-    );
+    try {
+      if (!user) return;
+      const postVotesQuery = query(
+        collection(firestore, `users/${user!.uid}/postVotes`),
+        where('communityId', '==', communityId)
+      );
 
-    const postVotesDocs = await getDocs(postVotesQuery);
-    const postVotes = postVotesDocs.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+      const postVotesDocs = await getDocs(postVotesQuery);
+      const postVotes = postVotesDocs.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-    setPostsData((prev) => ({
-      ...prev,
-      postVotes: postVotes as IPostVote[],
-    }));
+      setPostsData((prev) => ({
+        ...prev,
+        postVotes: postVotes as IPostVote[],
+      }));
+    } catch (e: any) {
+      console.log(e.message);
+    }
   };
+
+  const getCommunityData = async (id: string) => {
+    try {
+      const communityDocRef = doc(firestore, 'communities', id);
+      const communityDoc = await getDoc(communityDocRef);
+
+      setCommunityState((prev) => ({
+        ...prev,
+        currentCommunity: {
+          id: communityDoc.id,
+          ...communityDoc.data(),
+        } as ICommunity,
+      }));
+    } catch (e: any) {
+      console.log(e.message);
+    }
+  };
+
+  useEffect(() => {
+    const { communityId } = router.query;
+
+    if (communityId) {
+      const communityData = communityState.currentCommunity;
+
+      if (!communityData.id) {
+        getCommunityData(communityId as string);
+        return;
+      }
+    }
+  }, [router.query, communityState.currentCommunity]);
 
   useEffect(() => {
     if (!user?.uid || !communityState.currentCommunity) return;
@@ -168,7 +229,15 @@ const usePosts = () => {
     }
   }, [user, loadingUser]);
 
-  const onSelectPost = () => {};
+  const onSelectPost = (post: Post) => {
+    setPostsData((prev) => ({
+      ...prev,
+      selectedPost: post,
+    }));
+    router.push(
+      `/r/${communityState.currentCommunity.id}/comments/${post.id} `
+    );
+  };
 
   return {
     postsData,

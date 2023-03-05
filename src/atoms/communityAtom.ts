@@ -20,9 +20,17 @@ export type ICommunityState = {
   communitySnippets: ICommunitySnippet[];
   currentCommunity: ICommunity;
 };
+
+export const defaultCommunity: ICommunity = {
+  id: '',
+  authorId: '',
+  numberOfMembers: 0,
+  privacyType: 'public',
+};
+
 const defaultCommunityState: ICommunityState = {
   communitySnippets: [],
-  currentCommunity: {} as ICommunity,
+  currentCommunity: defaultCommunity,
 };
 
 const communityStateData = atom<ICommunityState>({

@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { Post } from '@/atoms/postsAtom';
+import postsAtom, { Post } from '@/atoms/postsAtom';
 import moment from 'moment';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
@@ -17,14 +17,20 @@ import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlin
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import communityStateData from '@/atoms/communityAtom';
 import { useRecoilValue } from 'recoil';
+import { useRouter } from 'next/router';
 
 type PostItemProps = {
   post: Post;
   userIsCreator: boolean;
   userVoteValue: number | undefined;
-  onVote: (post: Post, vote: number, communityId: string) => void;
-  onDelete: (post: Post) => Promise<boolean>;
-  onSelect: () => void;
+  onVote: (
+    e: React.MouseEvent,
+    post: Post,
+    vote: number,
+    communityId: string
+  ) => void;
+  onDelete: (e: React.MouseEvent, post: Post) => Promise<boolean>;
+  onSelect?: (post: Post) => void;
 };
 
 const PostItem: React.FC<PostItemProps> = ({
@@ -39,14 +45,20 @@ const PostItem: React.FC<PostItemProps> = ({
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const { currentCommunity } = useRecoilValue(communityStateData);
+  const isSinglePost = !onSelect;
+  const router = useRouter();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
     setLoadingDelete(true);
     try {
-      const success = await onDelete(post);
+      const success = await onDelete(e, post);
       if (!success) throw new Error('Failed to delete post');
 
       console.log('Deleted with success');
+
+      if (isSinglePost) {
+        router.push(`/r/${post.communityId}`);
+      }
     } catch (e: any) {
       console.log(e.message);
       setDeleteError(true);
@@ -55,7 +67,19 @@ const PostItem: React.FC<PostItemProps> = ({
   };
 
   return (
-    <Box display="flex" border="1px solid #9e9e9e" mb="10px" borderRadius="3px">
+    <Box
+      display="flex"
+      border="1px solid #9e9e9e"
+      mb="10px"
+      borderRadius={!isSinglePost ? '3px 3px 0 0 ' : '3px'}
+      sx={{
+        '&:hover': {
+          borderColor: !isSinglePost ? '#000' : '#9e9e9e',
+          cursor: !isSinglePost ? 'pointer' : 'inherit',
+        },
+      }}
+      onClick={() => onSelect && onSelect(post)}
+    >
       <Box
         display="flex"
         flexDirection="column"
@@ -63,9 +87,12 @@ const PostItem: React.FC<PostItemProps> = ({
         width="35px"
         bgcolor="#eeeeee"
         p="10px"
+        borderRadius="3px"
       >
         <ArrowCircleUpSharpIcon
-          onClick={() => onVote(post, 1, currentCommunity.id)}
+          onClick={(e: React.MouseEvent) =>
+            onVote(e, post, 1, currentCommunity.id)
+          }
           sx={{
             fill: userVoteValue === 1 ? '#fff' : '#9e9e9e',
             bgcolor: userVoteValue === 1 ? '#ff4300' : 'inherit',
@@ -74,7 +101,9 @@ const PostItem: React.FC<PostItemProps> = ({
         />
         <Typography>{post.voteStatus}</Typography>
         <ArrowCircleDownSharpIcon
-          onClick={() => onVote(post, -1, currentCommunity.id)}
+          onClick={(e: React.MouseEvent) =>
+            onVote(e, post, -1, currentCommunity.id)
+          }
           sx={{
             fill: userVoteValue === -1 ? '#fff' : '#9e9e9e',
             bgcolor: userVoteValue === -1 ? '#0079d3' : 'inherit',
@@ -83,7 +112,13 @@ const PostItem: React.FC<PostItemProps> = ({
         />
       </Box>
 
-      <Stack flexGrow="1" bgcolor="#fff" p="10px 15px">
+      <Stack
+        flexGrow="1"
+        bgcolor="#fff"
+        p="10px 15px"
+        borderRadius="3px"
+        sx={{ '&:hover': { bgcolor: !isSinglePost ? '#eeeeee' : '' } }}
+      >
         {deleteError && (
           <Alert severity="error">Error while deleting post</Alert>
         )}
