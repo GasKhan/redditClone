@@ -69,12 +69,11 @@ const PostItem: React.FC<PostItemProps> = ({
   return (
     <Box
       display="flex"
-      border="1px solid #9e9e9e"
-      mb="10px"
+      border={isSinglePost ? 'none' : '1px solid #9e9e9e'}
       borderRadius={!isSinglePost ? '3px 3px 0 0 ' : '3px'}
       sx={{
         '&:hover': {
-          borderColor: !isSinglePost ? '#000' : '#9e9e9e',
+          borderColor: !isSinglePost ? '#000' : '',
           cursor: !isSinglePost ? 'pointer' : 'inherit',
         },
       }}
@@ -85,7 +84,7 @@ const PostItem: React.FC<PostItemProps> = ({
         flexDirection="column"
         alignItems="center"
         width="35px"
-        bgcolor="#eeeeee"
+        bgcolor={isSinglePost ? '#fff' : '#eeeeee'}
         p="10px"
         borderRadius="3px"
       >

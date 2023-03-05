@@ -5,19 +5,22 @@ import { auth, firestore } from '@/firebase/clientApp';
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   increment,
   writeBatch,
 } from 'firebase/firestore';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 
 const useCommunityData = () => {
-  const [communityInfo, setCommunityInfo] = useRecoilState(communityAtom);
+  const [communityData, setCommunityData] = useRecoilState(communityAtom);
   const [user] = useAuthState(auth);
   const [error, setError] = useState('');
   const setAuthModalState = useSetRecoilState(AuthModalState);
+  const router = useRouter();
 
   const getSnippets = async () => {
     try {
@@ -25,7 +28,7 @@ const useCommunityData = () => {
         collection(firestore, `users/${user?.uid}/communitySnippets`)
       );
       const snippets = userSnippets.docs.map((doc) => ({ ...doc.data() }));
-      setCommunityInfo((prev) => ({
+      setCommunityData((prev) => ({
         ...prev,
         communitySnippets: snippets as ICommunitySnippet[],
       }));
@@ -71,7 +74,7 @@ const useCommunityData = () => {
 
       await batch.commit();
 
-      setCommunityInfo((prev) => ({
+      setCommunityData((prev) => ({
         ...prev,
         communitySnippets: [newSnippet],
       }));
@@ -94,7 +97,7 @@ const useCommunityData = () => {
 
       await batch.commit();
 
-      setCommunityInfo((prev) => ({
+      setCommunityData((prev) => ({
         ...prev,
         communitySnippets: prev.communitySnippets.filter(
           (com) => com.id !== community.id
@@ -106,11 +109,41 @@ const useCommunityData = () => {
     }
   };
 
+  const getCommunityData = async (id: string) => {
+    try {
+      const communityDocRef = doc(firestore, 'communities', id);
+      const communityDoc = await getDoc(communityDocRef);
+
+      setCommunityData((prev) => ({
+        ...prev,
+        currentCommunity: {
+          id: communityDoc.id,
+          ...communityDoc.data(),
+        } as ICommunity,
+      }));
+    } catch (e: any) {
+      console.log(e.message);
+    }
+  };
+
+  useEffect(() => {
+    const { communityId } = router.query;
+
+    if (communityId) {
+      const communityInfo = communityData.currentCommunity;
+
+      if (!communityInfo.id) {
+        getCommunityData(communityId as string);
+        return;
+      }
+    }
+  }, [router.query, communityData.currentCommunity]);
+
   useEffect(() => {
     if (!user) return;
     getSnippets();
   }, [user]);
 
-  return { communityInfo, onJoinOrLeaveCommunity, error };
+  return { communityData, onJoinOrLeaveCommunity, error };
 };
 export default useCommunityData;

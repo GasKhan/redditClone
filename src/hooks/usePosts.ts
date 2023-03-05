@@ -185,36 +185,6 @@ const usePosts = () => {
     }
   };
 
-  const getCommunityData = async (id: string) => {
-    try {
-      const communityDocRef = doc(firestore, 'communities', id);
-      const communityDoc = await getDoc(communityDocRef);
-
-      setCommunityState((prev) => ({
-        ...prev,
-        currentCommunity: {
-          id: communityDoc.id,
-          ...communityDoc.data(),
-        } as ICommunity,
-      }));
-    } catch (e: any) {
-      console.log(e.message);
-    }
-  };
-
-  useEffect(() => {
-    const { communityId } = router.query;
-
-    if (communityId) {
-      const communityData = communityState.currentCommunity;
-
-      if (!communityData.id) {
-        getCommunityData(communityId as string);
-        return;
-      }
-    }
-  }, [router.query, communityState.currentCommunity]);
-
   useEffect(() => {
     if (!user?.uid || !communityState.currentCommunity) return;
     getCommunityPostVotes(communityState.currentCommunity.id);

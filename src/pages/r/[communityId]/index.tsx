@@ -36,7 +36,7 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
       alignItems="center"
       flexDirection="column"
     >
-      <CommunityHeader communityData={communityData} />
+      <CommunityHeader communityInfo={communityData} />
       <PageContent>
         <>
           <CreatePostLink />

@@ -3,6 +3,7 @@ import { Post } from '@/atoms/postsAtom';
 import { auth, firestore } from '@/firebase/clientApp';
 import usePosts from '@/hooks/usePosts';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -52,7 +53,7 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
   return loading ? (
     <PostLoader />
   ) : (
-    <Box>
+    <Stack spacing="10px">
       {postsData.posts.map((post) => (
         <PostItem
           key={post.id}
@@ -67,7 +68,7 @@ const Posts: React.FC<PostsProps> = ({ communityData }) => {
           onSelect={onSelectPost}
         />
       ))}
-    </Box>
+    </Stack>
   );
 };
 export default Posts;

@@ -1,20 +1,19 @@
-import communityStateData, { ICommunity } from '@/atoms/communityAtom';
 import { Post } from '@/atoms/postsAtom';
 import About from '@/components/community/About';
 import PageContent from '@/components/layouts/PageContent';
+import Comments from '@/components/posts/comments/Comments';
 import PostItem from '@/components/posts/PostItem';
 import { auth, firestore } from '@/firebase/clientApp';
+import useCommunityData from '@/hooks/useCommunityData';
 import usePosts from '@/hooks/usePosts';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useRecoilState, useRecoilValue } from 'recoil';
 
 const SinglePostPage: React.FC = () => {
   const { postsData, setPostsData, onVotePost, onDeletePost } = usePosts();
-  const [communityState, setCommunityState] =
-    useRecoilState(communityStateData);
+  const { communityData } = useCommunityData();
   const [user] = useAuthState(auth);
   const { selectedPost: post } = postsData;
   const router = useRouter();
@@ -46,22 +45,29 @@ const SinglePostPage: React.FC = () => {
       <>
         <>
           {postsData.selectedPost && (
-            <PostItem
-              post={postsData.selectedPost}
-              onVote={onVotePost}
-              onDelete={onDeletePost}
-              userIsCreator={user?.uid === post?.creatorId}
-              userVoteValue={
-                postsData.postVotes.find((vote) => vote.postId === post?.id)
-                  ?.voteStatus
-              }
-            />
+            <>
+              <PostItem
+                post={postsData.selectedPost}
+                onVote={onVotePost}
+                onDelete={onDeletePost}
+                userIsCreator={user?.uid === post?.creatorId}
+                userVoteValue={
+                  postsData.postVotes.find((vote) => vote.postId === post?.id)
+                    ?.voteStatus
+                }
+              />
+              <Comments
+                user={user!}
+                communityId={communityData.currentCommunity.id}
+                selectedPost={post!}
+              />
+            </>
           )}
         </>
       </>
       <>
-        {communityState.currentCommunity.id && (
-          <About community={communityState.currentCommunity} />
+        {communityData.currentCommunity.id && (
+          <About community={communityData.currentCommunity} />
         )}
       </>
     </PageContent>
