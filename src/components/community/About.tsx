@@ -61,6 +61,7 @@ const About: React.FC<AboutProps> = ({ community }) => {
         );
 
         setCommunityState((prev) => ({
+          ...prev,
           communitySnippets: newCommunitySnippets,
           currentCommunity: {
             ...prev.currentCommunity,
