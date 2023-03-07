@@ -34,7 +34,9 @@ const CommunityCheckbox: React.FC<CommunityCheckboxProps> = ({
           <FormControlLabel
             value="public"
             checked={checkedVal === 'public'}
-            onChange={handleChange}
+            onChange={(e) =>
+              handleChange(e as React.ChangeEvent<HTMLInputElement>)
+            }
             control={<Radio color="secondary" />}
             label="Public"
             sx={{
@@ -51,7 +53,9 @@ const CommunityCheckbox: React.FC<CommunityCheckboxProps> = ({
           <FormControlLabel
             value="restricted"
             checked={checkedVal === 'restricted'}
-            onChange={handleChange}
+            onChange={(e) =>
+              handleChange(e as React.ChangeEvent<HTMLInputElement>)
+            }
             control={<Radio color="secondary" />}
             label="Restricted"
             sx={{
@@ -68,7 +72,9 @@ const CommunityCheckbox: React.FC<CommunityCheckboxProps> = ({
           <FormControlLabel
             value="private"
             checked={checkedVal === 'private'}
-            onChange={handleChange}
+            onChange={(e) =>
+              handleChange(e as React.ChangeEvent<HTMLInputElement>)
+            }
             control={<Radio color="secondary" />}
             label="Private"
             sx={{
