@@ -14,6 +14,9 @@ import SubmitModalButton from './SubmitModalButton';
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { auth, firestore } from '@/firebase/clientApp';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useRouter } from 'next/router';
+import useDirectory from '@/hooks/useDirectory';
+import useCommunityData from '@/hooks/useCommunityData';
 
 const CreateCommunityModal: React.FC = () => {
   const [open, setOpen] = React.useState(false);
@@ -21,6 +24,9 @@ const CreateCommunityModal: React.FC = () => {
   const [communityType, setCommunityType] = React.useState('public');
   const [error, setError] = React.useState('');
   const [user, loading, e] = useAuthState(auth);
+  const { toggleOpen } = useDirectory();
+  const { communityData, setCommunityData } = useCommunityData();
+  const router = useRouter();
   const reg = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/;
 
   const charRemained = 21 - communityName.length;
@@ -34,11 +40,11 @@ const CreateCommunityModal: React.FC = () => {
   };
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpen((prev) => !prev);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpen((prev) => !prev);
   };
 
   const handleCreateCommunity = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,18 +72,29 @@ const CreateCommunityModal: React.FC = () => {
           privacyType: communityType,
         });
 
+        const snippet = {
+          id: communityDocRef.id,
+          communityName: communityName,
+          isModerator: true,
+        };
         transaction.set(
           doc(firestore, `users/${user?.uid}/communitySnippets`, communityName),
-          {
-            communityName: communityName,
-            isModerator: true,
-          }
+          snippet
         );
+
+        setCommunityData((prev) => ({
+          ...prev,
+          communitySnippets: [...prev.communitySnippets, snippet],
+        }));
       });
+
+      toggleOpen();
+      router.push(`/r/${communityName}`);
     } catch (e: any) {
       console.log(e.message);
       setError(e.message);
     }
+    setOpen(false);
   };
 
   return (
@@ -110,7 +127,7 @@ const CreateCommunityModal: React.FC = () => {
               </Typography>
             </DialogContentText>
             <TextField
-              onBlur={() => console.log('blur')}
+              // onBlur={() => console.log('blur')}
               autoFocus
               margin="dense"
               id="name"

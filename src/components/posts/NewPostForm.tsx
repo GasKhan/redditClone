@@ -92,6 +92,9 @@ const NewPostForm: React.FC<NewPostFormProps> = ({ user }) => {
         title: postValue.title,
         body: postValue.body,
         numberOfComments: 0,
+        communityImageUrl: currentCommunity.imageUrl
+          ? currentCommunity.imageUrl
+          : '',
         voteStatus: 0,
         createdAt: serverTimestamp() as Timestamp,
       };

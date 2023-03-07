@@ -36,7 +36,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             sx={{
-              '& input': { fontSize: '14px' },
+              '& textarea': { fontSize: '14px' },
             }}
           />
           <Box

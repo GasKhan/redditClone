@@ -27,9 +27,13 @@ const useCommunityData = () => {
       const userSnippets = await getDocs(
         collection(firestore, `users/${user?.uid}/communitySnippets`)
       );
-      const snippets = userSnippets.docs.map((doc) => ({ ...doc.data() }));
+      const snippets = userSnippets.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setCommunityData((prev) => ({
         ...prev,
+        communityFetched: true,
         communitySnippets: snippets as ICommunitySnippet[],
       }));
     } catch (e: any) {
@@ -59,7 +63,7 @@ const useCommunityData = () => {
       const batch = writeBatch(firestore);
       const newSnippet: ICommunitySnippet = {
         id: community.id,
-        isModerator: false,
+        isModerator: user?.uid === community.creatorId,
         imageUrl: community.imageUrl || '',
       };
 
@@ -76,7 +80,7 @@ const useCommunityData = () => {
 
       setCommunityData((prev) => ({
         ...prev,
-        communitySnippets: [newSnippet],
+        communitySnippets: [...prev.communitySnippets, newSnippet],
       }));
     } catch (e: any) {
       console.log(e);
@@ -140,10 +144,17 @@ const useCommunityData = () => {
   }, [router.query, communityData.currentCommunity]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setCommunityData((prev) => ({
+        ...prev,
+        communitySnippets: [],
+        communityFetched: false,
+      }));
+      return;
+    }
     getSnippets();
   }, [user]);
 
-  return { communityData, onJoinOrLeaveCommunity, error };
+  return { communityData, setCommunityData, onJoinOrLeaveCommunity, error };
 };
 export default useCommunityData;

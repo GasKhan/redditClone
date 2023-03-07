@@ -10,7 +10,7 @@ import { Box } from '@mui/material';
 import PageContent from '../../../components/layouts/PageContent';
 import CreatePostLink from '@/components/CreatePostLink';
 import Posts from '@/components/posts/Posts';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import About from '@/components/community/About';
 
 type CommunityPageProps = {
@@ -20,14 +20,15 @@ type CommunityPageProps = {
 const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
   if (!communityData) return <NotFound />;
 
-  const setCommunityStateData = useSetRecoilState(communityStateData);
+  const [communityState, setCommunityState] =
+    useRecoilState(communityStateData);
 
   useEffect(() => {
-    setCommunityStateData((prev) => ({
+    setCommunityState((prev) => ({
       ...prev,
       currentCommunity: communityData,
     }));
-  });
+  }, [communityData]);
 
   return (
     <Box

@@ -3,7 +3,7 @@ import { atom } from 'recoil';
 
 export interface ICommunity {
   id: string;
-  authorId: string;
+  creatorId: string;
   numberOfMembers: number;
   privacyType: 'public' | 'restricted' | 'private';
   createdAt?: Timestamp;
@@ -19,11 +19,12 @@ export interface ICommunitySnippet {
 export type ICommunityState = {
   communitySnippets: ICommunitySnippet[];
   currentCommunity: ICommunity;
+  communityFetched: boolean;
 };
 
 export const defaultCommunity: ICommunity = {
   id: '',
-  authorId: '',
+  creatorId: '',
   numberOfMembers: 0,
   privacyType: 'public',
 };
@@ -31,6 +32,7 @@ export const defaultCommunity: ICommunity = {
 const defaultCommunityState: ICommunityState = {
   communitySnippets: [],
   currentCommunity: defaultCommunity,
+  communityFetched: false,
 };
 
 const communityStateData = atom<ICommunityState>({

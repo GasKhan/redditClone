@@ -18,6 +18,8 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import communityStateData from '@/atoms/communityAtom';
 import { useRecoilValue } from 'recoil';
 import { useRouter } from 'next/router';
+import RedditIcon from '@mui/icons-material/Reddit';
+import Link from 'next/link';
 
 type PostItemProps = {
   post: Post;
@@ -31,6 +33,7 @@ type PostItemProps = {
   ) => void;
   onDelete: (e: React.MouseEvent, post: Post) => Promise<boolean>;
   onSelect?: (post: Post) => void;
+  homePage?: boolean;
 };
 
 const PostItem: React.FC<PostItemProps> = ({
@@ -40,6 +43,7 @@ const PostItem: React.FC<PostItemProps> = ({
   onVote,
   onDelete,
   onSelect,
+  homePage,
 }) => {
   const [imgLoading, setImgLoading] = useState(true);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -63,7 +67,7 @@ const PostItem: React.FC<PostItemProps> = ({
       console.log(e.message);
       setDeleteError(true);
     }
-    setLoadingDelete(true);
+    setLoadingDelete(false);
   };
 
   return (
@@ -77,7 +81,9 @@ const PostItem: React.FC<PostItemProps> = ({
           cursor: !isSinglePost ? 'pointer' : 'inherit',
         },
       }}
-      onClick={() => onSelect && onSelect(post)}
+      onClick={() => {
+        if (!loadingDelete) onSelect && onSelect(post);
+      }}
     >
       <Box
         display="flex"
@@ -121,10 +127,50 @@ const PostItem: React.FC<PostItemProps> = ({
         {deleteError && (
           <Alert severity="error">Error while deleting post</Alert>
         )}
-        <Typography color="#9e9e9e" fontSize="12px">
-          Posted by u/{post.creatorDisplayName} a{' '}
-          {moment(new Date(post.createdAt.seconds * 1000)).fromNow()}
-        </Typography>
+        <Box display="flex" alignItems="center">
+          {homePage && (
+            <Box
+              display="flex"
+              alignItems="center"
+              mr="10px"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {post.communityImageUrl ? (
+                <img src={post.communityImageUrl} height="25px" width="25px" />
+              ) : (
+                <RedditIcon
+                  sx={{
+                    height: '25px',
+                    width: '25px',
+                    bgcolor: '#9e9e9e',
+                    fill: '#fff',
+                    borderRadius: '50%',
+                    mr: '10px',
+                  }}
+                />
+              )}
+              <Link
+                href={`r/${post.communityId}`}
+                style={{
+                  textDecoration: 'none',
+                }}
+              >
+                <Typography
+                  fontSize="12px"
+                  fontWeight="600"
+                  sx={{ '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {post.communityId}
+                </Typography>
+              </Link>
+            </Box>
+          )}
+          <Typography color="#9e9e9e" fontSize="12px">
+            Posted by u/{post.creatorDisplayName} a{' '}
+            {moment(new Date(post.createdAt.seconds * 1000)).fromNow()}
+          </Typography>
+        </Box>
+
         <Typography fontWeight="700">{post.title}</Typography>
         <Typography fontSize="12px" fontWeight="500" mb="10px">
           {post.body}

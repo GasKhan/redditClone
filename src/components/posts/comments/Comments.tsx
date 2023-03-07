@@ -179,6 +179,7 @@ const Comments: React.FC<CommentsProps> = ({
                 <CommentItem
                   key={comment.id}
                   commentId={comment.id}
+                  commentCreator={comment.creatorId}
                   user={user}
                   createdAt={comment.createdAt}
                   text={comment.text}

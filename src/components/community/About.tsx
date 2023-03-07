@@ -13,7 +13,7 @@ import { auth, firestore, storage } from '@/firebase/clientApp';
 import useSelectFile from '@/hooks/useSelectFile';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 type AboutProps = {
   community: ICommunity;
@@ -22,7 +22,8 @@ type AboutProps = {
 const About: React.FC<AboutProps> = ({ community }) => {
   const [user] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
-  const setCommunityStateData = useSetRecoilState(communityStateData);
+  const [communityState, setCommunityState] =
+    useRecoilState(communityStateData);
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const selectImgRef = useRef<HTMLInputElement>(null);
 
@@ -39,8 +40,28 @@ const About: React.FC<AboutProps> = ({ community }) => {
           imageUrl: downloadUrl,
         });
 
-        setCommunityStateData((prev) => ({
-          ...prev,
+        const snippetRef = doc(
+          firestore,
+          `users/${user?.uid}/communitySnippets/${community.id}`
+        );
+        updateDoc(snippetRef, {
+          imageUrl: downloadUrl,
+        });
+
+        const newCommunitySnippets = communityState.communitySnippets.map(
+          (snippet) => {
+            if (snippet.id === community.id) {
+              return {
+                ...snippet,
+                imageUrl: downloadUrl,
+              };
+            }
+            return snippet;
+          }
+        );
+
+        setCommunityState((prev) => ({
+          communitySnippets: newCommunitySnippets,
           currentCommunity: {
             ...prev.currentCommunity,
             imageUrl: downloadUrl,
@@ -169,7 +190,9 @@ const About: React.FC<AboutProps> = ({ community }) => {
                   }}
                 >
                   <img
-                    src={selectedFile || community.imageUrl}
+                    src={
+                      selectedFile || communityState.currentCommunity.imageUrl
+                    }
                     width="100%"
                     height="100%"
                   />

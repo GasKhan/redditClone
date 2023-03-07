@@ -17,6 +17,7 @@ type CommentItemProps = {
   onDelete: (commentId: string) => void;
   deleteLoading: boolean;
   user: User;
+  commentCreator: string;
   createdAt: Timestamp;
 };
 
@@ -26,6 +27,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onDelete,
   deleteLoading,
   user,
+  commentCreator,
   createdAt,
 }) => {
   return (
@@ -63,45 +65,54 @@ const CommentItem: React.FC<CommentItemProps> = ({
           sx={{ cursor: 'pointer' }}
           alignItems="center"
         >
-          <ArrowCircleUpSharpIcon
-            sx={{
-              fill: '#9e9e9e',
-              '&:hover': {
-                fill: '#2196F3',
-              },
-            }}
-          />
-          <ArrowCircleDownSharpIcon
-            sx={{
-              fill: '#9e9e9e',
-              '&:hover': {
-                fill: '#2196F3',
-              },
-            }}
-          />
-          <Typography
-            fontSize="12px"
-            color="#616161"
-            sx={{
-              '&:hover': {
-                color: '#2196F3',
-              },
-            }}
-          >
-            Edit
-          </Typography>
-          <Typography
-            onClick={() => onDelete(commentId)}
-            fontSize="12px"
-            color="#616161"
-            sx={{
-              '&:hover': {
-                color: '#2196F3',
-              },
-            }}
-          >
-            Delete
-          </Typography>
+          {user && (
+            <ArrowCircleUpSharpIcon
+              sx={{
+                fill: '#9e9e9e',
+                '&:hover': {
+                  fill: '#2196F3',
+                },
+              }}
+            />
+          )}
+          {user && (
+            <ArrowCircleDownSharpIcon
+              sx={{
+                fill: '#9e9e9e',
+                '&:hover': {
+                  fill: '#2196F3',
+                },
+              }}
+            />
+          )}
+          {user.uid === commentCreator && (
+            <Typography
+              fontSize="12px"
+              color="#616161"
+              sx={{
+                '&:hover': {
+                  color: '#2196F3',
+                },
+              }}
+            >
+              Edit
+            </Typography>
+          )}
+
+          {user.uid === commentCreator && (
+            <Typography
+              onClick={() => onDelete(commentId)}
+              fontSize="12px"
+              color="#616161"
+              sx={{
+                '&:hover': {
+                  color: '#2196F3',
+                },
+              }}
+            >
+              Delete
+            </Typography>
+          )}
         </Stack>
       </Stack>
     </Box>

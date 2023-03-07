@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import HomeIcon from '@mui/icons-material/Home';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
@@ -8,15 +7,30 @@ import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Typography } from '@mui/material';
 import CreateCommunityModal from '@/components/modals/CreateCommunityModal';
+import RedditIcon from '@mui/icons-material/Reddit';
+import MenuListItem from './MenuListItem';
+import useCommunityData from '@/hooks/useCommunityData';
+import useDirectory from '@/hooks/useDirectory';
 
 const Directory: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
+  const {
+    directoryState: { isOpen, selectedMenuItem },
+    toggleOpen,
+  } = useDirectory();
+  const { communityData } = useCommunityData();
+  const moderatingSnippets = communityData.communitySnippets.filter(
+    (community) => community.isModerator === true
+  );
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    toggleOpen();
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
+    toggleOpen();
     setAnchorEl(null);
   };
 
@@ -48,16 +62,30 @@ const Directory: React.FC = () => {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          <HomeIcon sx={{ width: 32, height: 32, color: '#000' }} />
+          {selectedMenuItem.imageUrl ? (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="25px"
+              width="25px"
+            >
+              <img src={selectedMenuItem.imageUrl} width="100%" height="100%" />
+            </Box>
+          ) : (
+            <selectedMenuItem.Icon
+              sx={{ width: 32, height: 32, color: selectedMenuItem.iconColor }}
+            />
+          )}
           <Typography
             display={{ xs: 'none', md: 'flex' }}
             mr={{ xs: ' 15px', lg: 'auto' }}
             ml="10px"
             fontSize="12px"
             fontWeight="700"
-            color="#000"
+            color={selectedMenuItem.iconColor}
           >
-            Home
+            {selectedMenuItem.displayText}
           </Typography>
           <KeyboardArrowDownIcon />
         </IconButton>
@@ -65,9 +93,9 @@ const Directory: React.FC = () => {
       <Menu
         anchorEl={anchorEl}
         id="account-menu"
-        open={open}
+        open={isOpen}
         onClose={handleClose}
-        // onClick={handleClose}
+        // onClick={toggleOpen}
         PaperProps={{
           elevation: 0,
           sx: {
@@ -97,10 +125,48 @@ const Directory: React.FC = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
+        {!!moderatingSnippets.length && (
+          <MenuItem>
+            <Typography fontSize="12px">MODERATING</Typography>
+          </MenuItem>
+        )}
+
+        {moderatingSnippets.map((snippet) => {
+          return (
+            <MenuItem key={snippet.id}>
+              <MenuListItem
+                key={snippet.id}
+                displayText={snippet.id}
+                Icon={RedditIcon}
+                iconColor="#ff4300"
+                link={`/r/${snippet.id}`}
+                imageUrl={snippet.imageUrl}
+              />
+            </MenuItem>
+          );
+        })}
+
+        <MenuItem>
+          <Typography fontSize="12px">MY COMMUNITIES</Typography>
+        </MenuItem>
         <MenuItem>
           <AddIcon />
           <CreateCommunityModal />
         </MenuItem>
+        {communityData.communitySnippets.map((snippet) => {
+          return (
+            <MenuItem key={snippet.id}>
+              <MenuListItem
+                key={snippet.id}
+                displayText={snippet.id}
+                Icon={RedditIcon}
+                iconColor="#0079d3"
+                link={`/r/${snippet.id}`}
+                imageUrl={snippet.imageUrl}
+              />
+            </MenuItem>
+          );
+        })}
       </Menu>
     </React.Fragment>
   );

@@ -19,6 +19,7 @@ import { useSetRecoilState } from 'recoil';
 import { AuthModalState } from '@/atoms/authModalAtom';
 import { MenuList, Typography } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { useRouter } from 'next/router';
 
 interface DropDownMenuProps {
   user?: User | null;
@@ -29,6 +30,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
   const open = Boolean(anchorEl);
   const [signOut, loading, signOutError] = useSignOut(auth);
   const setAuthModal = useSetRecoilState(AuthModalState);
+  const router = useRouter();
 
   const showAuthModal = () => {
     setAuthModal((prev) => ({ isOpen: true, view: 'logIn' }));
@@ -136,6 +138,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
               onClick={() => {
                 handleClose();
                 signOut();
+                router.push('/');
               }}
             >
               <ListItemIcon>

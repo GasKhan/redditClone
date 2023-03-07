@@ -8,11 +8,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase/clientApp';
 import { useSetRecoilState } from 'recoil';
 import { AuthModalState } from '@/atoms/authModalAtom';
+import useDirectory from '@/hooks/useDirectory';
 
 const CreatePostLink: React.FC = () => {
   const router = useRouter();
   const user = useAuthState(auth);
   const setLoginModal = useSetRecoilState(AuthModalState);
+  const { toggleOpen } = useDirectory();
 
   const handleLinkClick = (e: React.MouseEvent) => {
     if (!user) {
@@ -21,16 +23,21 @@ const CreatePostLink: React.FC = () => {
         view: 'logIn',
       });
     }
+
     const { communityId } = router.query;
-    router.push(`/r/${communityId}/submit`);
+    if (communityId) {
+      router.push(`/r/${communityId}/submit`);
+    } else {
+      toggleOpen();
+    }
   };
 
   return (
     <Box
       width="100%"
       display="flex"
+      alignItems="flex-start"
       flexGrow="1"
-      alignItems="center"
       p="10px"
       mb="20px"
       borderRadius="2px"
