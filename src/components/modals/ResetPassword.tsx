@@ -44,8 +44,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = () => {
     >
       <Typography align="center" color="#9e9e9e">
         {' '}
-        Enter the email associated with your account and we'll send you a reset
-        link
+        Enter the email associated with your account and we&apos;ll send you a
+        reset link
       </Typography>
       <EmailInput inputName="email" handleChange={handleChange} email={email} />
       <SubmitModalButton loading={false} text="Reset Password" />
