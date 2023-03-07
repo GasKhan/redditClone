@@ -18,8 +18,6 @@ type CommunityPageProps = {
 };
 
 const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
-  if (!communityData) return <NotFound />;
-
   const [communityState, setCommunityState] =
     useRecoilState(communityStateData);
 
@@ -28,8 +26,11 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ communityData }) => {
       ...prev,
       currentCommunity: communityData,
     }));
-  }, [communityData]);
+  }, [communityData, setCommunityState]);
 
+  if (!communityData) {
+    return <NotFound />;
+  }
   return (
     <Box
       display="flex"
