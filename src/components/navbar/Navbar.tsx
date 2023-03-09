@@ -19,8 +19,12 @@ const Navbar: React.FC = () => {
       justifyContent="center"
       alignItems="center"
       sx={{
+        position: 'sticky',
+        top: '0',
+        zIndex: 10,
         p: '6px 12px',
         bgcolor: '#fff',
+        borderBottom: '1px solid #eee',
       }}
     >
       <Box
@@ -50,17 +54,6 @@ const Navbar: React.FC = () => {
           height="100%"
         />
       </Box>
-      {/* <Box
-        onClick={() => onSelectMenuItem(defaultDirectoryMenuItem)}
-        sx={{
-          width: 46,
-          display: {
-            xs: 'none',
-            sm: 'flex',
-            cursor: 'pointer',
-          },
-        }}
-      ></Box> */}
 
       {user && <Directory />}
       <SearchInput user={user} />

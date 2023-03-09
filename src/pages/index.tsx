@@ -3,8 +3,9 @@ import { IPostVote, Post } from '@/atoms/postsAtom';
 import PersonalHome from '@/components/community/PersonalHome';
 import Premium from '@/components/community/Premium';
 import Recommendation from '@/components/community/Recommendation';
-import CreatePostLink from '@/components/CreatePostLink';
+import CreatePostLink from '@/components/posts/CreatePostLink';
 import PageContent from '@/components/layouts/PageContent';
+import CreateCommunityModal from '@/components/modals/CreateCommunityModal';
 import PostItem from '@/components/posts/PostItem';
 import { auth, firestore } from '@/firebase/clientApp';
 import useCommunityData from '@/hooks/useCommunityData';
@@ -21,7 +22,6 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useRecoilValue } from 'recoil';
 
 export default function Home() {
   const [user, userLoading] = useAuthState(auth);

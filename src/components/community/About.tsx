@@ -27,6 +27,12 @@ const About: React.FC<AboutProps> = ({ community }) => {
   const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const selectImgRef = useRef<HTMLInputElement>(null);
 
+  const indexOfCurrentCommunity = communityState.communitySnippets.findIndex(
+    (item) => item.id === communityState.currentCommunity.id
+  );
+  let isModerator =
+    communityState.communitySnippets[indexOfCurrentCommunity]?.isModerator;
+
   const handleSaveImageChange = async () => {
     try {
       setLoading(true);
@@ -151,7 +157,7 @@ const About: React.FC<AboutProps> = ({ community }) => {
           </Link>
         </Box>
         <Divider />
-        {true && (
+        {isModerator && (
           <Stack>
             <Typography fontWeight="700" fontSize="14px" my="10px">
               Admin

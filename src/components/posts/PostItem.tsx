@@ -136,7 +136,12 @@ const PostItem: React.FC<PostItemProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               {post.communityImageUrl ? (
-                <img src={post.communityImageUrl} height="25px" width="25px" />
+                <img
+                  src={post.communityImageUrl}
+                  height="25px"
+                  width="25px"
+                  style={{ marginRight: '5px' }}
+                />
               ) : (
                 <RedditIcon
                   sx={{

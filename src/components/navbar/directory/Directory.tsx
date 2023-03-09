@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import CreateCommunityModal from '@/components/modals/CreateCommunityModal';
 import RedditIcon from '@mui/icons-material/Reddit';
 import MenuListItem from './MenuListItem';
@@ -13,8 +13,10 @@ import useCommunityData from '@/hooks/useCommunityData';
 import useDirectory from '@/hooks/useDirectory';
 
 const Directory: React.FC = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  // const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  // const open = Boolean(anchorEl);
+  const anchorRef = React.useRef(null);
+  const [openCreateCommunity, setOpenCreateCommunity] = React.useState(false);
 
   const {
     directoryState: { isOpen, selectedMenuItem },
@@ -27,20 +29,26 @@ const Directory: React.FC = () => {
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     toggleOpen();
-    setAnchorEl(event.currentTarget);
+    // setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     toggleOpen();
-    setAnchorEl(null);
+    // setAnchorEl(null);
   };
 
   return (
     <React.Fragment>
+      <CreateCommunityModal
+        open={openCreateCommunity}
+        setOpen={setOpenCreateCommunity}
+      />
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           textAlign: 'center',
+          bgcolor: '#fafafa',
+          borderRadius: '1px',
           width: {
             xs: 'auto',
             lg: '200px',
@@ -50,17 +58,18 @@ const Directory: React.FC = () => {
       >
         <IconButton
           onClick={handleClick}
+          ref={anchorRef}
           size="small"
           sx={{
-            ml: { xs: 0, sm: 2 },
+            ml: { xs: 0, sm: 1 },
             borderRadius: '10px',
             display: 'flex',
             justifyContent: { xs: 'center', sm: 'space-between' },
             width: '100%',
           }}
-          aria-controls={open ? 'account-menu' : undefined}
+          // aria-controls={open ? 'account-menu' : undefined}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
+          // aria-expanded={open ? 'true' : undefined}
         >
           {selectedMenuItem.imageUrl ? (
             <Box
@@ -91,7 +100,7 @@ const Directory: React.FC = () => {
         </IconButton>
       </Box>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={anchorRef.current}
         id="account-menu"
         open={isOpen}
         onClose={handleClose}
@@ -150,8 +159,16 @@ const Directory: React.FC = () => {
           <Typography fontSize="12px">MY COMMUNITIES</Typography>
         </MenuItem>
         <MenuItem>
-          <AddIcon />
-          <CreateCommunityModal />
+          <Button
+            onClick={() => {
+              toggleOpen();
+              setOpenCreateCommunity(true);
+            }}
+            sx={{ color: '#000' }}
+          >
+            <AddIcon sx={{ mr: '10px' }} />
+            <Typography>Create a new community</Typography>
+          </Button>
         </MenuItem>
         {communityData.communitySnippets.map((snippet) => {
           return (

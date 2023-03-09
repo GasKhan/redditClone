@@ -29,7 +29,7 @@ export const defaultCommunity: ICommunity = {
   privacyType: 'public',
 };
 
-const defaultCommunityState: ICommunityState = {
+export const defaultCommunityState: ICommunityState = {
   communitySnippets: [],
   currentCommunity: defaultCommunity,
   communityFetched: false,

@@ -21,6 +21,7 @@ const TabItem: React.FC<TabItemProps> = ({
       borderRight="1px solid #f1ecec"
       borderTop="none"
       borderBottom={selectedTab === tab.title ? '3px solid #2196F3' : ''}
+      sx={{ cursor: 'pointer' }}
       onClick={() => setSelectedTab(tab.title)}
     >
       <SvgIcon

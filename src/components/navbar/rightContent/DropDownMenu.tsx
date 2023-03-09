@@ -20,6 +20,10 @@ import { AuthModalState } from '@/atoms/authModalAtom';
 import { MenuList, Typography } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useRouter } from 'next/router';
+import useCommunityData from '@/hooks/useCommunityData';
+import { defaultCommunityState } from '@/atoms/communityAtom';
+import useDirectory from '@/hooks/useDirectory';
+import { defaultDirectoryMenuItem } from '@/atoms/directoryMenuAtom';
 
 interface DropDownMenuProps {
   user?: User | null;
@@ -43,6 +47,12 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
     setAnchorEl(null);
   };
 
+  const handleLogOut = () => {
+    handleClose();
+    signOut();
+    router.push('/');
+  };
+
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -50,7 +60,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
           <IconButton
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2, borderRadius: '10px' }}
+            sx={{ ml: 1, borderRadius: '10px' }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
@@ -136,9 +146,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ user }) => {
             <Divider />
             <MenuItem
               onClick={() => {
-                handleClose();
-                signOut();
-                router.push('/');
+                handleLogOut();
               }}
             >
               <ListItemIcon>

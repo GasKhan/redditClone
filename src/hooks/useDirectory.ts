@@ -1,5 +1,6 @@
 import communityStateData from '@/atoms/communityAtom';
 import directoryMenuState, {
+  defaultDirectoryMenuItem,
   directoryMenuItem,
 } from '@/atoms/directoryMenuAtom';
 import { useRouter } from 'next/router';
@@ -46,7 +47,7 @@ export default function useDirectory() {
         },
       }));
     }
-  }, [communityState]);
+  }, [communityState.currentCommunity]);
 
-  return { directoryState, toggleOpen, onSelectMenuItem };
+  return { directoryState, setDirectoryState, toggleOpen, onSelectMenuItem };
 }

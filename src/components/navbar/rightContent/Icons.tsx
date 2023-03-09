@@ -14,7 +14,7 @@ const boxStyles = {
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: '50%',
-  mx: '10px',
+  mx: '1px',
   height: '30px',
   width: '30px',
   cursor: 'pointer',
@@ -24,6 +24,9 @@ const Icons: React.FC<IconsProps> = () => {
     <>
       <Box
         display={{ xs: 'none', md: 'flex' }}
+        justifyContent="space-around"
+        flexGrow="1"
+        pr="10px"
         sx={{ borderRight: '1px solid #616161' }}
       >
         <Box sx={boxStyles}>
@@ -36,7 +39,7 @@ const Icons: React.FC<IconsProps> = () => {
           <VideocamIcon sx={{ ...boxStyles, border: 'none' }} />
         </Box>
       </Box>
-      <>
+      <Box display="flex" justifyContent="space-around" flexGrow="1" ml="10px">
         <Box>
           <TextsmsOutlinedIcon sx={{ ...boxStyles, border: 'none' }} />
         </Box>
@@ -46,7 +49,7 @@ const Icons: React.FC<IconsProps> = () => {
         <Box display={{ xs: 'none', sm: 'flex' }}>
           <AddIcon sx={{ ...boxStyles, border: 'none' }} />
         </Box>
-      </>
+      </Box>
     </>
   );
 };

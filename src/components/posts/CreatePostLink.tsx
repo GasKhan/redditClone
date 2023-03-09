@@ -12,14 +12,14 @@ import useDirectory from '@/hooks/useDirectory';
 
 const CreatePostLink: React.FC = () => {
   const router = useRouter();
-  const user = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const setLoginModal = useSetRecoilState(AuthModalState);
   const { toggleOpen } = useDirectory();
 
   const handleLinkClick = (e: React.MouseEvent) => {
-    if (!user) {
+    if (user === null) {
       setLoginModal({
-        isOpen: false,
+        isOpen: true,
         view: 'logIn',
       });
     }

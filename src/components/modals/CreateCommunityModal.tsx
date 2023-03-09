@@ -18,8 +18,16 @@ import { useRouter } from 'next/router';
 import useDirectory from '@/hooks/useDirectory';
 import useCommunityData from '@/hooks/useCommunityData';
 
-const CreateCommunityModal: React.FC = () => {
-  const [open, setOpen] = React.useState(false);
+type CreateCommunityModalProps = {
+  open: boolean;
+  setOpen: (isOpen: boolean) => void;
+};
+
+const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
+  open,
+  setOpen,
+}) => {
+  // const [open, setOpen] = React.useState(false);
   const [communityName, setCommunityName] = React.useState('');
   const [communityType, setCommunityType] = React.useState('public');
   const [error, setError] = React.useState('');
@@ -37,14 +45,6 @@ const CreateCommunityModal: React.FC = () => {
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length <= 21) setCommunityName(e.target.value);
-  };
-
-  const handleClickOpen = () => {
-    setOpen((prev) => !prev);
-  };
-
-  const handleClose = () => {
-    setOpen((prev) => !prev);
   };
 
   const handleCreateCommunity = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,7 +88,7 @@ const CreateCommunityModal: React.FC = () => {
         }));
       });
 
-      toggleOpen();
+      // toggleOpen();
       router.push(`/r/${communityName}`);
     } catch (e: any) {
       console.log(e.message);
@@ -99,13 +99,10 @@ const CreateCommunityModal: React.FC = () => {
 
   return (
     <div>
-      <Button onClick={handleClickOpen} sx={{ color: '#000' }}>
-        Create a new community
-      </Button>
       <Dialog open={open} fullWidth maxWidth="sm">
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={() => setOpen(false)}
           sx={{
             position: 'absolute',
             right: 8,
@@ -127,7 +124,6 @@ const CreateCommunityModal: React.FC = () => {
               </Typography>
             </DialogContentText>
             <TextField
-              // onBlur={() => console.log('blur')}
               autoFocus
               margin="dense"
               id="name"
@@ -164,7 +160,7 @@ const CreateCommunityModal: React.FC = () => {
             <Button
               variant="outlined"
               color="secondary"
-              onClick={handleClose}
+              onClick={() => setOpen(false)}
               type="button"
             >
               Cancel

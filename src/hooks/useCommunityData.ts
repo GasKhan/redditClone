@@ -1,5 +1,8 @@
 import { AuthModalState } from '@/atoms/authModalAtom';
-import communityAtom, { ICommunity } from '@/atoms/communityAtom';
+import communityAtom, {
+  defaultCommunity,
+  ICommunity,
+} from '@/atoms/communityAtom';
 import { ICommunitySnippet } from '@/atoms/communityAtom';
 import { auth, firestore } from '@/firebase/clientApp';
 import {
@@ -149,6 +152,7 @@ const useCommunityData = () => {
         ...prev,
         communitySnippets: [],
         communityFetched: false,
+        currentCommunity: defaultCommunity,
       }));
       return;
     }
